@@ -1,4 +1,3 @@
-# Tmall Project 简介
-Tmall Project 是基于 SSM 框架开发的电商网站
-
-后续内容还会添加
+# PPmall Project
+## 项目简介
+PPmall 是一个基于 SSM 框架开发的电商购物网站，采用前后端分离的架构设计
