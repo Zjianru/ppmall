@@ -6,7 +6,6 @@ import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,10 +37,11 @@ public class TokenCache {
     }
 
     public static String getKey(String key){
+        String checkValue = "null";
         String value = null;
         try {
             value = localCache.get(key);
-            if("null".equals(value)){
+            if(checkValue.equals(value)){
                 return null;
             }
             return value;
