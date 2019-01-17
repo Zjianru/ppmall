@@ -24,7 +24,7 @@ public class PropertiesUtil {
     private static Properties props;
 
     static {
-        String fileName = "tmall.properties";
+        String fileName = "ppmall.properties";
         props = new Properties();
         try {
             props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(fileName), StandardCharsets.UTF_8));
