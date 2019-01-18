@@ -22,8 +22,8 @@ public class DateTimeUtil {
 
     /**
      * String to Date in STANDARD_FORMAT
-     * @param dateTimeStr
-     * @return
+     * @param dateTimeStr String 类型 时间表示
+     * @return Date
      */
     public static Date strToDate(String dateTimeStr){
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(STANDARD_FORMAT);
@@ -33,8 +33,8 @@ public class DateTimeUtil {
 
     /**
      * Date to String in STANDARD_FORMAT
-     * @param date
-     * @return
+     * @param date date类型时间
+     * @return String类型转换完成
      */
     public static String dateToStr(Date date){
         if (date == null){

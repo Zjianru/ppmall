@@ -272,20 +272,13 @@ public class IOrderServiceImpl implements IOrderService {
                 // 支付宝回调地址
                 .setGoodsDetailList(goodsDetailList);
 
-
-        /** 一定要在创建AlipayTradeService之前调用Configs.init()设置默认参数
-         *  Configs会读取classpath下的zfbinfo.properties文件配置信息，如果找不到该文件则确认该文件是否在classpath目录
-         */
         Configs.init("zfbinfo.properties");
 
-        /** 使用Configs提供的默认参数
-         *  AlipayTradeService可以使用单例或者为静态成员对象，不需要反复new
-         */
         AlipayTradeService tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
         AlipayF2FPrecreateResult result = tradeService.tradePrecreate(builder);
         switch (result.getTradeStatus()) {
             case SUCCESS:
-                logger.info("支付宝预下单成功: )");
+                logger.info("支付宝预下单成功: ");
                 AlipayTradePrecreateResponse response = result.getResponse();
                 dumpResponse(response);
                 File folder = new File(path);
@@ -328,6 +321,7 @@ public class IOrderServiceImpl implements IOrderService {
      */
     @Override
     public ServerResponse aliCallBack(Map<String, String> params) {
+        System.out.println("----------------"+"aliCallBack METHOD IN IOderServiceImpl Class"+"--------------");
         Long orderNo = Long.parseLong(params.get("out_trade_no"));
         String tradeNo = params.get("trade_no");
         String tradeStatus = params.get("trade_status");
@@ -339,8 +333,12 @@ public class IOrderServiceImpl implements IOrderService {
             return ServerResponse.createBySuccess("支付宝重复调用");
         }
         if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)) {
+            System.out.println("================================================");
+            System.out.println(order.toString());
+            System.out.println("================================================");
             order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));
             order.setStatus(Const.OrderStatusEnum.PAID.getCode());
+            System.out.println(order.toString());
             orderMapper.updateByPrimaryKeySelective(order);
         }
         PpmallPayInfo payInfo = new PpmallPayInfo();

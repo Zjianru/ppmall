@@ -1,6 +1,7 @@
 package com.ppmall.controller.portal;
 
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.demo.trade.config.Configs;
 import com.google.common.collect.Maps;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -136,7 +138,7 @@ public class OrderController {
         if (user == null) {
             return ServerResponse.createByERRORCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        String path = request.getSession().getServletContext().getRealPath("upload");
+        String path = request.getSession().getServletContext().getRealPath("/");
         System.out.println("--------------------"+path+"----------------");
         return iOrderService.pay(orderNo,user.getId(),path);
     }
@@ -151,28 +153,39 @@ public class OrderController {
     @ResponseBody
     public Object alipayCallback(HttpServletRequest request){
         Map<String,String> params = Maps.newHashMap();
+
         Map requestParams = request.getParameterMap();
         for (Object o : requestParams.keySet()) {
             String name = (String) o;
             String[] values = (String[]) requestParams.get(name);
             String valueStr = "";
             for (int i = 0; i < values.length; i++) {
+
                 valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
             }
             params.put(name, valueStr);
         }
-        logger.info("支付宝回调，sign:{},trade_status:{}，参数:{}",params.get("sign"),params.get("trade_status"),params.toString());
-        params.remove("charset");
+        logger.info("支付宝回调,sign:{},trade_status:{},参数:{}",params.get("sign"),params.get("trade_status"),params.toString());
+
+        //验证回调的正确性,是不是支付宝发的.并且呢还要避免重复通知.
+
+        params.remove("sign_type");
         try {
             boolean alipayRSACheckedV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(),"utf-8",Configs.getSignType());
-                if (!alipayRSACheckedV2){
-                return ServerResponse.createByERRORMessage("非法请求，验证不通过，继续恶意请求将以违法论处");
+
+            if(!alipayRSACheckedV2){
+                return ServerResponse.createByERRORMessage("非法请求,验证不通过");
             }
         } catch (AlipayApiException e) {
-            logger.error("支付宝回调异常 ",e);
+            logger.error("支付宝验证回调异常",e);
         }
+
+        //todo 验证各种数据
+
+
+        //
         ServerResponse serverResponse = iOrderService.aliCallBack(params);
-        if (serverResponse.isSuccess()){
+        if(serverResponse.isSuccess()){
             return Const.AlipayCallback.RESPONSE_SUCCESS;
         }
         return Const.AlipayCallback.RESPONSE_FAILED;
@@ -197,8 +210,4 @@ public class OrderController {
         }
         return ServerResponse.createBySuccess(false);
     }
-
-
-
-
 }
