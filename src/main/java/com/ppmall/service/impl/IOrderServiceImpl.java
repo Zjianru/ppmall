@@ -218,7 +218,7 @@ public class IOrderServiceImpl implements IOrderService {
         String outTradeNo = order.getOrderNo().toString();
 
         // (必填) 订单标题，粗略描述用户的支付目的。如“xxx品牌xxx门店当面付扫码消费”
-        String subject = "Tmall商城扫码支付，订单号：" + outTradeNo;
+        String subject = "Ppmall商城扫码支付，订单号：" + outTradeNo;
 
         // (必填) 订单总金额，单位为元，不能超过1亿元
         // 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
@@ -298,6 +298,7 @@ public class IOrderServiceImpl implements IOrderService {
                 String qrFileName = String.format("qr-%s.png", response.getOutTradeNo());
                 ZxingUtils.getQRCodeImge(response.getQrCode(), 256, qrPath);
                 File targetFile = new File(path, qrFileName);
+                System.out.println("---------------------------"+targetFile.toString()+"-----------------------");
                 try {
                     FTPUtil.uploadFile(Lists.newArrayList(targetFile));
                 } catch (IOException e) {
