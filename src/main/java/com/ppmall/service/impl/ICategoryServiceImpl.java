@@ -6,10 +6,9 @@ import com.ppmall.common.ServerResponse;
 import com.ppmall.dao.PpmallCategoryMapper;
 import com.ppmall.pojo.PpmallCategory;
 import com.ppmall.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +24,13 @@ import java.util.Set;
  * com.ppmall.service.impl
  * 2019/1/16
  */
+@Slf4j
 @Service("iCategoryService")
 public class ICategoryServiceImpl implements ICategoryService {
-    
 
     @Autowired
     PpmallCategoryMapper categoryMapper;
 
-
-
-    private Logger logger = LoggerFactory.getLogger(ICategoryServiceImpl.class);
 
     /**
      * 添加商品品类
@@ -92,7 +88,7 @@ public class ICategoryServiceImpl implements ICategoryService {
     public ServerResponse<List<PpmallCategory>> getChildrenParallelCategory(Integer categoryId) {
         List<PpmallCategory> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
         if(CollectionUtils.isEmpty(categoryList)){
-            logger.info("未找到当前分类的子分类");
+            log.info("未找到当前分类的子分类");
         }
         return ServerResponse.createBySuccess(categoryList);
     }

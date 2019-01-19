@@ -3,6 +3,7 @@ package com.ppmall.service.impl;
 import com.google.common.collect.Lists;
 import com.ppmall.service.IFileService;
 import com.ppmall.util.FTPUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,10 @@ import java.util.UUID;
  * com.ppmall.service.impl
  * 2019/1/16
  */
+@Slf4j
 @Service("iFileService")
 public class IFileServiceImpl implements IFileService {
 
-    private Logger logger = LoggerFactory.getLogger(IFileServiceImpl.class);
 
     /**
      * 上传文件
@@ -36,7 +37,7 @@ public class IFileServiceImpl implements IFileService {
         String fileName = file.getOriginalFilename();
         String fileExtendName = fileName.substring(fileName.lastIndexOf(".") + 1);
         String uploadFileName = UUID.randomUUID().toString() + "." + fileExtendName;
-        logger.info("开始上传文件，上传文件的文件名：{}，上传的路径：{}，新文件名：{}", fileName, path, uploadFileName);
+        log.info("开始上传文件，上传文件的文件名：{}，上传的路径：{}，新文件名：{}", fileName, path, uploadFileName);
         File fileDir = new File(path);
         if (!fileDir.exists()) {
             fileDir.setWritable(true);
@@ -48,7 +49,7 @@ public class IFileServiceImpl implements IFileService {
             FTPUtil.uploadFile(Lists.newArrayList(targetFile));
             targetFile.delete();
         } catch (IOException e) {
-            logger.error("上传文件异常！", e);
+            log.error("上传文件异常！", e);
             return null;
         }
         return targetFile.getName();
