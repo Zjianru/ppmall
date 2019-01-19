@@ -43,7 +43,8 @@ public class OrderController {
 
     /**
      * 创建订单
-     * @param session session 信息
+     *
+     * @param session    session 信息
      * @param shippingId 收货地址 Id
      * @return ServerResponse
      */
@@ -54,11 +55,12 @@ public class OrderController {
         if (user == null) {
             return ServerResponse.createByERRORCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iOrderService.createOrder(user.getId(),shippingId);
+        return iOrderService.createOrder(user.getId(), shippingId);
     }
 
     /**
      * 取消订单
+     *
      * @param session session 信息
      * @param orderNo 订单号
      * @return ServerResponse
@@ -70,11 +72,12 @@ public class OrderController {
         if (user == null) {
             return ServerResponse.createByERRORCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iOrderService.cancel(user.getId(),orderNo);
+        return iOrderService.cancel(user.getId(), orderNo);
     }
 
     /**
      * 获得订单购物车产品内容
+     *
      * @param session session 信息
      * @return ServerResponse
      */
@@ -90,42 +93,45 @@ public class OrderController {
 
     /**
      * 获取订单详情
+     *
      * @param session session 信息
      * @param orderNo 订单号
      * @return ServerResponse
      */
     @RequestMapping("detail.do")
     @ResponseBody
-    public ServerResponse detail(HttpSession session,Long orderNo) {
+    public ServerResponse detail(HttpSession session, Long orderNo) {
         PpmallUser user = (PpmallUser) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByERRORCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iOrderService.getOrderDetail(user.getId(),orderNo);
+        return iOrderService.getOrderDetail(user.getId(), orderNo);
     }
 
     /**
      * 分页查看详情
-     * @param session session 信息
-     * @param pageNum 页数
+     *
+     * @param session  session 信息
+     * @param pageNum  页数
      * @param pageSize 每页容量
      * @return ServerResponse
      */
     @RequestMapping("list.do")
     @ResponseBody
     public ServerResponse list(HttpSession session,
-                               @RequestParam(value = "pageNum",defaultValue = "1") int pageNum ,
-                               @RequestParam(value = "pageSize",defaultValue = "10")int pageSize) {
+                               @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         PpmallUser user = (PpmallUser) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByERRORCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iOrderService.getOrderList(user.getId(),pageNum,pageSize);
+        return iOrderService.getOrderList(user.getId(), pageNum, pageSize);
     }
 
 
     /**
      * 支付调用
+     *
      * @param session session 信息
      * @param orderNo 订单编号
      * @param request request
@@ -139,20 +145,20 @@ public class OrderController {
             return ServerResponse.createByERRORCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
         String path = request.getSession().getServletContext().getRealPath("/");
-        System.out.println("--------------------"+path+"----------------");
-        return iOrderService.pay(orderNo,user.getId(),path);
+        return iOrderService.pay(orderNo, user.getId(), path);
     }
 
 
     /**
      * 支付宝回调
+     *
      * @param request HttpServletRequest
      * @return Object
      */
     @RequestMapping("alipay_callback.do")
     @ResponseBody
-    public Object alipayCallback(HttpServletRequest request){
-        Map<String,String> params = Maps.newHashMap();
+    public Object alipayCallback(HttpServletRequest request) {
+        Map<String, String> params = Maps.newHashMap();
 
         Map requestParams = request.getParameterMap();
         for (Object o : requestParams.keySet()) {
@@ -165,19 +171,19 @@ public class OrderController {
             }
             params.put(name, valueStr);
         }
-        logger.info("支付宝回调,sign:{},trade_status:{},参数:{}",params.get("sign"),params.get("trade_status"),params.toString());
+        logger.info("支付宝回调,sign:{},trade_status:{},参数:{}", params.get("sign"), params.get("trade_status"), params.toString());
 
         //验证回调的正确性,是不是支付宝发的.并且呢还要避免重复通知.
 
         params.remove("sign_type");
         try {
-            boolean alipayRSACheckedV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(),"utf-8",Configs.getSignType());
+            boolean alipayRSACheckedV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType());
 
-            if(!alipayRSACheckedV2){
+            if (!alipayRSACheckedV2) {
                 return ServerResponse.createByERRORMessage("非法请求,验证不通过");
             }
         } catch (AlipayApiException e) {
-            logger.error("支付宝验证回调异常",e);
+            logger.error("支付宝验证回调异常", e);
         }
 
         //todo 验证各种数据
@@ -185,7 +191,7 @@ public class OrderController {
 
         //
         ServerResponse serverResponse = iOrderService.aliCallBack(params);
-        if(serverResponse.isSuccess()){
+        if (serverResponse.isSuccess()) {
             return Const.AlipayCallback.RESPONSE_SUCCESS;
         }
         return Const.AlipayCallback.RESPONSE_FAILED;
@@ -193,6 +199,7 @@ public class OrderController {
 
     /**
      * 查询订单支付状态
+     *
      * @param session session 信息
      * @param orderNo 订单号
      * @return ServerResponse<Boolean>
@@ -204,8 +211,8 @@ public class OrderController {
         if (user == null) {
             return ServerResponse.createByERRORCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        ServerResponse serverResponse =  iOrderService.queryOrderPayStatus(user.getId(),orderNo);
-        if (serverResponse.isSuccess()){
+        ServerResponse serverResponse = iOrderService.queryOrderPayStatus(user.getId(), orderNo);
+        if (serverResponse.isSuccess()) {
             return ServerResponse.createBySuccess(true);
         }
         return ServerResponse.createBySuccess(false);

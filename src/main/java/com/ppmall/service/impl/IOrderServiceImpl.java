@@ -291,7 +291,6 @@ public class IOrderServiceImpl implements IOrderService {
                 String qrFileName = String.format("qr-%s.png", response.getOutTradeNo());
                 ZxingUtils.getQRCodeImge(response.getQrCode(), 256, qrPath);
                 File targetFile = new File(path, qrFileName);
-                System.out.println("---------------------------"+targetFile.toString()+"-----------------------");
                 try {
                     FTPUtil.uploadFile(Lists.newArrayList(targetFile));
                 } catch (IOException e) {
@@ -321,7 +320,6 @@ public class IOrderServiceImpl implements IOrderService {
      */
     @Override
     public ServerResponse aliCallBack(Map<String, String> params) {
-        System.out.println("----------------"+"aliCallBack METHOD IN IOderServiceImpl Class"+"--------------");
         Long orderNo = Long.parseLong(params.get("out_trade_no"));
         String tradeNo = params.get("trade_no");
         String tradeStatus = params.get("trade_status");
@@ -333,12 +331,8 @@ public class IOrderServiceImpl implements IOrderService {
             return ServerResponse.createBySuccess("支付宝重复调用");
         }
         if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)) {
-            System.out.println("================================================");
-            System.out.println(order.toString());
-            System.out.println("================================================");
             order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));
             order.setStatus(Const.OrderStatusEnum.PAID.getCode());
-            System.out.println(order.toString());
             orderMapper.updateByPrimaryKeySelective(order);
         }
         PpmallPayInfo payInfo = new PpmallPayInfo();
