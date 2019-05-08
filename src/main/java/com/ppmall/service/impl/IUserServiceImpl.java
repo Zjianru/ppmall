@@ -27,7 +27,7 @@ public class IUserServiceImpl implements IUserService {
 
 
     @Autowired
-    private PpmallUserMapper Ppmallusermapper;
+    private PpmallUserMapper ppmallusermapper;
 
     /**
      * 用户登录
@@ -37,12 +37,12 @@ public class IUserServiceImpl implements IUserService {
      */
     @Override
     public ServerResponse<PpmallUser> login(String userName, String password) {
-        int resultCount = Ppmallusermapper.checkUsername(userName);
+        int resultCount = ppmallusermapper.checkUsername(userName);
         if (resultCount == 0) {
             return ServerResponse.createByERRORMessage("用户名不存在");
         }
         String md5password = MD5Util.md5encodeutf8(password);
-        PpmallUser user = Ppmallusermapper.selectUserLogin(userName, md5password);
+        PpmallUser user = ppmallusermapper.selectUserLogin(userName, md5password);
         if(user ==null){
             return ServerResponse.createByERRORMessage("密码错误");
         }
@@ -71,7 +71,7 @@ public class IUserServiceImpl implements IUserService {
         user.setRole(Const.Role.ROLE_CUSTOMER);
         // MD5 加密
         user.setPassword(MD5Util.md5encodeutf8(user.getPassword()));
-        int resultCount = Ppmallusermapper.insert(user);
+        int resultCount = ppmallusermapper.insert(user);
         if(resultCount == 0 ){
             return ServerResponse.createByERRORMessage("注册失败");
         }
@@ -88,14 +88,14 @@ public class IUserServiceImpl implements IUserService {
         if (StringUtils.isNotBlank(type)){
             // 校验用户名是否存在
             if(Const.USERNAME.equals(type)){
-                int resultCount = Ppmallusermapper.checkUsername(string);
+                int resultCount = ppmallusermapper.checkUsername(string);
                 if (resultCount > 0) {
                     return ServerResponse.createByERRORMessage("用户名已存在");
                 }
             }
             // 校验 email 是否存在
             if (Const.EMAIL.equals(type)){
-                int resultCount = Ppmallusermapper.checkUserEmail(string);
+                int resultCount = ppmallusermapper.checkUserEmail(string);
                 if (resultCount > 0) {
                     return ServerResponse.createByERRORMessage("email已存在");
                 }
@@ -117,7 +117,7 @@ public class IUserServiceImpl implements IUserService {
             // 用户不存在
             return ServerResponse.createByERRORMessage("用户不存在");
         }
-        String question = Ppmallusermapper.selectQuestionByUsername(username);
+        String question = ppmallusermapper.selectQuestionByUsername(username);
         if(StringUtils.isNotBlank(question)){
             return ServerResponse.createBySuccess(question);
         }
@@ -133,7 +133,7 @@ public class IUserServiceImpl implements IUserService {
      */
     @Override
     public ServerResponse<String> checkAnswer(String username, String question, String answer){
-        int resultCount = Ppmallusermapper.checkAnswer(username,question,answer);
+        int resultCount = ppmallusermapper.checkAnswer(username,question,answer);
         if(resultCount > 0){
             // 问题和问题答案是这个用户设置 并且回答正确
             String forgetToken = UUID.randomUUID().toString();
@@ -166,7 +166,7 @@ public ServerResponse<String> forgetResetPassword(String username, String passwo
     }
     if(StringUtils.equals(forgetToken,token)){
         String md5Password = MD5Util.md5encodeutf8(passwordNew);
-        int rowCount = Ppmallusermapper.updatePasswordByUsername(username, md5Password);
+        int rowCount = ppmallusermapper.updatePasswordByUsername(username, md5Password);
         if (rowCount > 0){
             return ServerResponse.createBySuccessMessage("密码重置成功");
         }
@@ -186,12 +186,12 @@ public ServerResponse<String> forgetResetPassword(String username, String passwo
     @Override
     public ServerResponse<String> resetPassword(String passwordOld, String passwordNew, PpmallUser user){
         // 防止横向越权，作用户校验
-        int resultCount = Ppmallusermapper.checkPasswordByUserId(MD5Util.md5encodeutf8(passwordOld),user.getId());
+        int resultCount = ppmallusermapper.checkPasswordByUserId(MD5Util.md5encodeutf8(passwordOld),user.getId());
         if (resultCount == 0){
             return ServerResponse.createByERRORMessage("旧密码错误！");
         }
         user.setPassword(MD5Util.md5encodeutf8(passwordNew));
-        int updateCount = Ppmallusermapper.updateByPrimaryKeySelective(user);
+        int updateCount = ppmallusermapper.updateByPrimaryKeySelective(user);
         if (updateCount > 0){
             return ServerResponse.createBySuccessMessage("密码更新成功");
         }
@@ -206,7 +206,7 @@ public ServerResponse<String> forgetResetPassword(String username, String passwo
     public ServerResponse<PpmallUser> updateInformation(PpmallUser user){
         // username 不能被更新
         // email 更新限制：是否存在，存在则不能是当前用户
-        int resultCount = Ppmallusermapper.checkEmailByUserId(user.getEmail(),user.getId());
+        int resultCount = ppmallusermapper.checkEmailByUserId(user.getEmail(),user.getId());
         if(resultCount > 0){
             return ServerResponse.createByERRORMessage("邮箱已被占用，请更换后重试");
         }
@@ -217,7 +217,7 @@ public ServerResponse<String> forgetResetPassword(String username, String passwo
         updateUser.setPhone(user.getPhone());
         updateUser.setQuestion(user.getQuestion());
         updateUser.setAnswer(user.getAnswer());
-        int updateCount = Ppmallusermapper.updateByPrimaryKeySelective(updateUser);
+        int updateCount = ppmallusermapper.updateByPrimaryKeySelective(updateUser);
         if (updateCount > 0){
              return ServerResponse.createBySuccess("更新个人信息成功",updateUser);
         }
@@ -231,7 +231,7 @@ public ServerResponse<String> forgetResetPassword(String username, String passwo
      */
     @Override
     public ServerResponse<PpmallUser> getInformation(Integer userId){
-        PpmallUser user  = Ppmallusermapper.selectByPrimaryKey(userId);
+        PpmallUser user  = ppmallusermapper.selectByPrimaryKey(userId);
         if (user == null){
             return ServerResponse.createByERRORMessage("找不到当前用户");
         }

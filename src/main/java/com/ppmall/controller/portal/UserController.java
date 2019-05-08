@@ -4,12 +4,16 @@ import com.ppmall.common.ResponseCode;
 import com.ppmall.common.ServerResponse;
 import com.ppmall.pojo.PpmallUser;
 import com.ppmall.service.IUserService;
+import com.ppmall.util.CookieUtil;
+import com.ppmall.util.JsonUtil;
+import com.ppmall.util.RedisPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -33,14 +37,17 @@ public class UserController {
      * @param username 用户帐号
      * @param password 用户密码
      * @param session Session 信息
+     * @param httpServletResponse response
      * @return User Object 对象
      */
-    @RequestMapping(value = "login.do",method = RequestMethod.POST)
+
+	@RequestMapping(value = "login.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<PpmallUser> login(String username, String password, HttpSession session){
+    public ServerResponse<PpmallUser> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse){
         ServerResponse<PpmallUser> response = iUserService.login(username, password);
         if(response.isSuccess()){
-            session.setAttribute(Const.CURRENT_USER,response.getData());
+	        CookieUtil.writeLoginToken(httpServletResponse,session.getId());
+            RedisPoolUtil.setEx(session.getId(),Const.RedisCacheExtime.REDIS_SESSION_EXTIME, JsonUtil.obj2String(response.getData()));
         }
     return response;
     }

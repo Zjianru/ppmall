@@ -1,7 +1,6 @@
 package com.ppmall.controller.portal;
 
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.demo.trade.config.Configs;
 import com.google.common.collect.Maps;

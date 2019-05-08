@@ -1,5 +1,7 @@
 package com.ppmall.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 
 /**
@@ -10,6 +12,7 @@ import java.math.BigDecimal;
  * com.ppmall.vo
  * 2019/1/15
  */
+@Data
 public class ProductListVo {
     /**
      * ID
@@ -45,68 +48,4 @@ public class ProductListVo {
      * 图片主机前缀
      */
     private String imageHost;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getCategoryid() {
-        return categoryid;
-    }
-
-    public void setCategoryid(Integer categoryid) {
-        this.categoryid = categoryid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSubtitle() {
-        return subtitle;
-    }
-
-    public void setSubtitle(String subtitle) {
-        this.subtitle = subtitle;
-    }
-
-    public String getMainImage() {
-        return mainImage;
-    }
-
-    public void setMainImage(String mainImage) {
-        this.mainImage = mainImage;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getImageHost() {
-        return imageHost;
-    }
-
-    public void setImageHost(String imageHost) {
-        this.imageHost = imageHost;
-    }
 }
